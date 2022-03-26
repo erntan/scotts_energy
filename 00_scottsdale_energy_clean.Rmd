@@ -85,16 +85,6 @@ d[
 d$building_type <- tolower(d$building_type)
 ```
 
-```{r}
-# d[c("site_name")]
-
-# Want to (1) remove unneeded variables
-# (do natural gas, solar, etc. usage add up to electricity_usage?)
-# Relationship between building type and department?
-# (Now that Im typing, obviously the answer is yes.)
-```
-
-
 <!-- #### Energy use intensity column 
 We notice that there are many `NA` values for `energy_use_intensity`. Let's take a look at the sites where `energy_use_intensity = NA`. -->
 ```{r}
