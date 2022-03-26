@@ -73,13 +73,20 @@ d$latitude <- as.numeric(d$latitude)
 d$longitude <- as.numeric(d$longitude)
 ```
 #### Building type column 
-
 ```{r}
-# d$building_type <- tolower(d$building_type)
+unique(d$building_type)
 ```
-
-Analysis
+We notice that we have building types "N/A" and " N/A ". Let's change those strings to the value `NA`. In addition, the letter casing is inconsistent, so let us convert it to lowercase.  
+```{r}
+d[
+        d$building_type == "N/A" | d$building_type == " N/A ",
+        c("building_type")
+] <- NA
+d$building_type <- tolower(d$building_type)
+```
+# Analysis
 ## Electricity Usage 
+
 ```{r}
 # d <- d[order(d$electricity_usage, decreasing = TRUE), ]
 
