@@ -85,6 +85,26 @@ d[
 d$building_type <- tolower(d$building_type)
 ```
 
+## `NA` values
+```{r}
+subset(d, is.na(building_type)) # Some multi-location sites, some ambiguous
+subset(d, is.na(latitude))
+```
+For any sites with an address, we will fill in the latitude and longitude. Data was taken from Google Maps.
+```{r}
+# 1658 S Litchfield Rd
+d[
+        d["address"] == "1658 S Litchfield Rd",
+        c("latitude", "longitude")
+] <- c(33.42719273452142, -112.35756158572785)
+
+# 333 S 42nd St
+d [
+        d["address"] == "333 S 42nd St",
+        c("latitude", "longitude")
+] <- c(33.44477620868195, -111.99011796985566)
+```
+
 <!-- #### Energy use intensity column 
 We notice that there are many `NA` values for `energy_use_intensity`. Let's take a look at the sites where `energy_use_intensity = NA`. -->
 ```{r}
