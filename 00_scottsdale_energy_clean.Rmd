@@ -115,7 +115,3 @@ print(paste("IGNORE",
         "rows have energy_use_intensity = N/A."
 ))
 ```
-<!-- Nearly half of the rows have null energy use intensities; there is not a meaningful amount of data to be able to perform analysis on energy use intensity, so let us get rid of the data.  -->
-```{r}
-# d$energy_use_intensity <- NULL
-``` 
