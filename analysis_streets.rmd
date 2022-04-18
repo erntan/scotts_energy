@@ -40,3 +40,18 @@ text(
          col = c("red", "blue")
  )
 ```
+
+Now let's take a look at the sites that use less energy than a traffic signal.
+```{r}
+# plot.new()
+barplot(subset(elec_mid, elec_mid < est[1] | elec_mid < est[2]), ylim = c(0,27000)) # ELEC_MID IS DEFINED IN 01 NB.
+abline(h = est[1], col = "red")
+abline(h = est[2], col = "blue")
+text(
+  20,
+  y = c(est[1], est[2]) + 1000,
+  labels = c("200 traffic signals", "300 traffic signals"),
+    cex = 0.8,
+    col = c("red", "blue")
+ )
+```
