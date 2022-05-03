@@ -11,7 +11,7 @@ signals <- subset(d, site_name == "Traffic Signals")
 ```
 
 ## Estimating the Amount of Energy a Streetlight Uses
-[According to the City of Scottsdale](https://www.scottsdaleaz.gov/Streets/) as of 30 March 2022, there are nearly 300 traffic signals in Scottsdale. We will estimate the number of traffic signals as somewhere between 200 and 300, saved in the variable `num_sigs`.
+[According to the City of Scottsdale](https://web.archive.org/web/20211228224254/https://www.scottsdaleaz.gov/Streets/) as of 30 March 2022, there are nearly 300 traffic signals in Scottsdale. We will estimate the number of traffic signals as somewhere between 200 and 300, saved in the variable `num_sigs`.
 ```{r}
 num_sigs <- c(200, 300)
 ```
@@ -43,8 +43,11 @@ text(
 
 Now let's take a look at the sites that use less energy than a traffic signal.
 ```{r}
-# plot.new()
-barplot(subset(elec_mid, elec_mid < est[1] | elec_mid < est[2]), ylim = c(0,27000)) # ELEC_MID IS DEFINED IN 01 NB.
+par(mfrow = c(1, 1))
+barplot(
+  subset(elec_mid, elec_mid < est[1] | elec_mid < est[2]),
+  ylim = c(0, 27000)
+) # ELEC_MID IS DEFINED IN 01 NB.
 abline(h = est[1], col = "red")
 abline(h = est[2], col = "blue")
 text(
@@ -55,3 +58,5 @@ text(
     col = c("red", "blue")
  )
 ```
+
+Now we want to get the buildings that use less energy than the traffic signals.
