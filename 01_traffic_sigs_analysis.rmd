@@ -1,0 +1,113 @@
+# Traffic signals and Energy Usage of Public Buildings in Scottsdale
+We would like to compare the energy usage of the traffic signals in Scottsdale to the energy usage of other buildings.
+
+Energy usage data is taken from Scottsdale Open Data. We import and clean this data in `00_import_clean.r`, and we store the streetlight-specific data in `signals`.
+```{r}
+# Import the data.
+source("00_import_clean.r", local = knitr::knit_global())
+
+# Streetlight data.
+signals <- subset(d, site_name == "Traffic Signals")
+```
+
+## Estimating the Amount of Energy a Streetlight Uses
+[According to the City of Scottsdale](https://web.archive.org/web/20211228224254/https://www.scottsdaleaz.gov/Streets/) as of 30 March 2022, there are nearly 300 traffic signals in Scottsdale. We will estimate the number of traffic signals as somewhere between 200 and 300, saved in the variable `num_sigs`.
+```{r}
+num_sigs <- c(200, 300)
+```
+
+We will assume that traffic signals take up the same amount of energy-- this makes sense because every streetlight should be on at all times. Implicit (and being made explicit) in this assumption is that all traffic signals were constantly operating (i.e. there were no expected interruptions like street repairs). In any case, the assumption is generous, as the energy usage per streetlight would be higher if there were less traffic signals operating.
+
+Thus, the energy calculation is simple-- divide the total energy usage by the number of traffic signals. We will store this in the variable `est`.
+
+```{r}
+est <- signals$electricity_usage / num_sigs
+print(est)
+```
+A single streetlight requires between 17,404 and 26,106 kilowatts per year. 
+
+These numbers don't mean anything to me! They need to be compared. Let's compare the energy usage of a single streetlight to the energy usage of different buildings in Scottsdale. 
+
+```{r}
+barplot(elec_mid) # ELEC_MID IS DEFINED IN 01 NB.
+abline(h = est[1], col = "red")
+abline(h = est[2], col = "blue")
+text(
+       40,
+       y = c(est[1], est[2]) + 8000,
+       labels = c("200 traffic signals", "300 traffic signals"),
+         cex = 0.8,
+         col = c("red", "blue")
+ )
+```
+
+Now let's take a look at the sites that use less energy than a traffic signal.
+```{r}
+par(mfrow = c(1, 1))
+barplot(
+  subset(elec_mid, elec_mid < est[1] | elec_mid < est[2]),
+  ylim = c(0, 27000)
+) # ELEC_MID IS DEFINED IN 01 NB.
+abline(h = est[1], col = "red")
+abline(h = est[2], col = "blue")
+text(
+  20,
+  y = c(est[1], est[2]) + 1000,
+  labels = c("200 traffic signals", "300 traffic signals"),
+    cex = 0.8,
+    col = c("red", "blue")
+ )
+```
+
+Now we want to get the buildings that use less energy than the traffic signals.
+```{r}
+bldgs_lt_sigs <- subset(d, d$electricity_usage < est[2])
+
+t <- bldgs_lt_sigs[,c("site_name","electricity_usage","department","building_type")]
+```
+
+```{r}
+t
+```
+The buildings that use less energy than a single traffic signal are not all that out there. they are parks, buildings that don't seem to use that much energy. How about comparing energy usage for all traffic signals?
+
+## Energy usage compared to the total energy usage of traffic signals.
+```{r}
+elec_sigs <- signals$electricity_usage # Electricity usage of all signals
+
+# Buildings minus traffic signals 
+d_no_sigs <- subset(d, site_name != "Traffic Signals")
+
+# Plot 
+barplot(
+  d_no_sigs$electricity_usage 
+)
+abline(h = elec_sigs, col = "blue")
+text(
+  20,
+  y = c(est[1], est[2]) + 1000,
+  labels = c("Energy Usage of Traffic Signals"),
+    cex = 0.8,
+    col = c("red")
+ )
+```
+
+Now I want the sites whose energy usage is less than the usage of the traffic signals. 
+
+```{r}
+d_less_than_sigs <- subset(d_no_sigs, electricity_usage <= elec_sigs)
+
+d_less_than_sigs[order(d_less_than_sigs$electricity_usage, decreasing = TRUE),]  
+```
+
+Typical household 11,000 kW hours / year (https://www.eia.gov/energyexplained/use-of-energy/electricity-use-in-homes.php)
+```{r}
+# Energy usage per square foot of buildings
+
+```
+
+```{r}
+d_more_than_sigs <- subset(d_no_sigs, electricity_usage > elec_sigs)
+
+d_more_than_sigs[order(d_more_than_sigs$electricity_usage),]
+```
