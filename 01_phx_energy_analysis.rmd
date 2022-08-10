@@ -1,0 +1,71 @@
+# Analysis
+Now we have properly formatted the data that is needed to explore electricity usage. 
+```{r, include = FALSE}
+source("00_import_clean.r", local = knitr::knit_global())
+```
+
+## Initial Observations 
+```{r}
+summary(d)
+```
+## Electricity Usage 
+* **current_solar**: Peak capacity in kW of solar panels installed at site. 
+* **natural_gas_usage**: Total annual natural gas consumption at site in therms. 
+<!-- 
+# Relationship between building type and department?
+# (Now that Im typing, obviously the answer is yes.) --> 
+```{r}
+elec <- d$electricity_usage
+p <- hist(elec)
+```
+We have one large bar and at least 3 tiny bars-- clearly the outliers are large. We can see this clearly in a boxplot, where the outliers are defined as any values 1.5*IQR outside the first and third quartiles. 
+```{r}
+bp <- boxplot(elec)
+```
+
+```{r, include = FALSE}
+summary(elec)
+iqr_elec <- IQR(elec)
+```
+
+Let's take out the outliers. 
+```{r}
+elec_mid <- setdiff(elec, bp$out)
+boxplot(elec_mid)
+hist(elec_mid)
+```
+We now have a more reasonable distribution. The distribution still is heavily skewed towards the lower end-- that means that there are many sites that require very little energy (< 50,000 kW/yr) and fewer sites that require large amounts of energy. 
+
+Let us try to find where the outliers belong.
+```{r}
+par(mfrow = c(2, 1))
+bp_all <- boxplot(electricity_usage ~ department, data = d, las = 2)
+
+boxplot(electricity_usage ~ building_type, data = d, las = 2)
+```
+
+We first note that the Water department has a significantly higher energy usage than any other department.
+```{r}
+subset(d, department == "Water")
+```
+
+Looking at the data, we see that the Water department contains only one data point, the Water Services Department. The entire water services department is captured in a single data point rather than separated by building.
+
+What if we drop that department?
+```{r}
+bp_all <- boxplot(electricity_usage ~ department,
+        data = d[d$department != "Water", ], las = 2
+)
+```
+Now Aviation has the most outliers, which is what we expected.
+
+
+Does electricity usage relate to building area?
+```{r}
+par(mfrow = c(1, 1))
+with(d, plot(building_area, electricity_usage))
+with(d, cor(building_area, electricity_usage))
+```
+We expected the correlation to be much higher. Perhaps there is a stronger relationship between electricity usage and department or building type. 
+<!-- Compare the outliers energy usage to everything else? -->
+
